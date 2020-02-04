@@ -10,3 +10,17 @@ h1 {
     font-family: "Comic Sans MS";
     font-size: 2vw;
 }
+
+#damier {
+    display: flex;
+}
+
+.case {
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    width: 5vw;
+    height: 5vw;
+    font-family: "Comic Sans MS";
+    font-size: 2vw;
+}
