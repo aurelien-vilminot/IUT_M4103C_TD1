@@ -1,7 +1,12 @@
-body{
+body {
     display: flex;
-    flex-direction: ;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     background: aquamarine;
+}
+
+h1 {
+    font-family: "Comic Sans MS";
+    font-size: 2vw;
 }
