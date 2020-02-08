@@ -6,16 +6,25 @@
     let cssToken = {'color': 'red'};
 
     class MonDamier {
-        constructor() {
-            this.currentPlayer = 1;
-            this.tab = [[undefined,undefined,undefined], [undefined,undefined,undefined], [undefined,undefined,undefined]];
-        }
+        constructor(longueur, largeur) {
+            this.currentPlayer = undefined;
+            this.longueur = longueur;
+            this.largeur = largeur;
+            this.tab = [];
+            for (let y = 0 ; y < this.longueur ; ++y) {
+                this.tab[y] = [];
+                for (let x = 0 ; x < this.largeur ; ++x) {
+                    this.tab[y][x] = undefined;
+                }
+            }
+        } // constructor()
 
-        build (longueur, largeur, endroit) {
-            for (let y = 0 ; y < largeur ; ++y) {
+        build (endroit) {
+            this.changePlayer();
+            for (let y = 0 ; y < this.largeur ; ++y) {
                 let ligne = $('<div></div>');
                 $(endroit).append(ligne);
-                for (let x = 0; x < longueur; ++x) {
+                for (let x = 0; x < this.longueur; ++x) {
                     ligne.append(
                         $('<div class="case"></div>')
                             .data('parent', this)
@@ -31,28 +40,30 @@
                                     $(this).data('clicked', 1);
                                     $(this).data('x-coord', x);
                                     $(this).data('y-coord', y);
-                                    $(this).data('parent').fillTab($(this));
+                                    $(this).data('parent').fillCell($(this));
                                 }
 
                                 $(this).data('parent').changeToken($(this));
-                                $(this).data('parent').victory($(this));
+                                if ($(this).data('parent').victory($(this))) {
+                                    location.reload();
+                                }
                                 $(this).data('parent').changePlayer();
                             })
                     );
                 }
             }
-        }
+        } // build()
 
         changePlayer(){
             if (this.currentPlayer === 1) {
                 $('#message').html('<p>Joueur 2 à toi de jouer</p>').css({'color': 'blue'});
                 this.currentPlayer = 2;
             }
-            else {
+            else if (this.currentPlayer === 2 || this.currentPlayer === undefined) {
                 $('#message').html('<p>Joueur 1 à toi de jouer</p>').css({'color': 'blue'});
                 this.currentPlayer = 1;
             }
-        }
+        } // changePlayer()
 
         changeToken(cell) {
             if (this.currentPlayer === 1) {
@@ -61,26 +72,61 @@
             else {
                 cell.html('<p>O</p>').css(cssToken);
             }
-        }
+        } // changeToken()
 
-        fillTab(cell) {
-            this.tab[cell.data('y-coord')][cell.data('x-coord')] = this.currentPlayer;
-            console.log(this.tab);
-        }
+        fillCell(cell) {
+            this.tab[cell.data('x-coord')][cell.data('y-coord')] = this.currentPlayer;
+        } // fillCell()
 
         victory(cell) {
-            if ((this.tab[0][cell.data('x-coord')] == this.tab[1][cell.data('x-coord')] == this.tab[2][cell.data('x-coord')]) && this.tab[0][cell.data('x-coord')] != undefined) {
-                alert('Joueur ' + this.currentPlayer + ' a gagné !');
-            } else if ((this.tab[cell.data('y-coord')][0] == this.tab[cell.data('y-coord')][1] == this.tab[cell.data('y-coord')][2]) && this.tab[cell.data('y-coord')][0] != undefined) {
-                alert('Joueur ' + this.currentPlayer + ' a gagné !');
-                return;
+            let x = 0;
+            let y = 0;
+            let casesAreEqual = true;
+
+            while (x < this.longueur && casesAreEqual) {
+                if (x === 0) {
+                    var tempCaseX = this.tab[x][cell.data('y-coord')];
+                }
+                else {
+                    if (this.tab[x][cell.data('y-coord')] !== tempCaseX) {
+                        casesAreEqual = false;
+                    }
+                    else {
+                        tempCaseX = this.tab[x][cell.data('y-coord')];
+                    }
+                }
+                x += 1;
             }
-        }
-    }
+
+            if (casesAreEqual) {
+                alert('Joueur ' + this.currentPlayer + ' a gagné en colonne !');
+                return true;
+            }
+            else {
+                casesAreEqual = true;
+                while (y < this.largeur && casesAreEqual) {
+                    if (y === 0) {
+                        var tempCaseY = this.tab[cell.data('x-coord')][y];
+                    } else {
+                        if (this.tab[cell.data('x-coord')][y] !== tempCaseY) {
+                            casesAreEqual = false;
+                        } else {
+                            tempCaseY = this.tab[cell.data('x-coord')][y];
+                        }
+                    }
+                    y += 1;
+                }
+            }
+            if (casesAreEqual) {
+                alert('Joueur ' + this.currentPlayer + ' a gagné en ligne !');
+                return true;
+            }
+        } // victory()
+    } // MonDamier
 
     $(document).ready(function () {
 
-        let monDamier = new MonDamier();
-        monDamier.build(3,3,'#damier');
+        let monDamier = new MonDamier(3,3);
+        monDamier.build('#damier');
     });
 })();
